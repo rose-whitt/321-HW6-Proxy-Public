@@ -1,0 +1,50 @@
+COMP 321 Project 6: Web Proxy
+
+Rose Whitt
+Harry Witt
+
+---(Do not write lines of text that exceed the width of this line.)------------
+
+DESIGN DESCRIPTION
+
+
+
+For our proxy, we implemented a pre-threading strategy where we created 4
+Worker threads that continuously attempt to remove connection requests from
+A shared buffer. This shared buffer included a list of available connections,
+As well as the relevant mutex variable and condition variables. Our main 
+routine
+Listens continuously for requests, and accepts the request as soon as it comes
+In. As soon as our Main routine accepts a request, it attains mutual exclusion 
+and inserts the request into the buffer, then signals to the workers that they 
+can remove a request from the Buffer. Similarly, our workers acquire mutual 
+exclusion and take a request out Of the buffer, then signal that the buffer can
+accept new connections. Once a thread has acquired a request, it then moves on 
+in our Program to change the request to the correct format. We do this by 
+taking out The “proxy connection” line, changing the url to the path in the 
+request header,And setting the connection to close. Then we open a connection
+to the end server, Which we received from the request, and write the newly 
+formed request to the Server. Then, we wait for a response from the server,
+and write it back to the Client immediately, while also creating a log in our
+log file. Finally, we close the Connection to the end server, and close the
+connection to the client.
+
+TESTING STRATEGY
+
+
+We tested our concurrent proxy implementation using the given urls.
+We submitted multiple requests over and over again through both telnet
+ and our web browser that points to our proxy to test concurrency.
+Additionally, we test: valid urls, invalid urls, urls longer than maxline,
+concurrent requests, urls containing an assortment of things
+(basic text, images, videos, etc.), supports HTTP/1.0 and HTTP/1.1 requests,
+the proxy properly logs for sequential and concurrent requests for all urls,
+error handling matches reference solution, and log file entries are always
+written atomically and do not corrupt the log file.
+We also found a website of random ‘http’ websites and tested every single one.
+We selected these URL inputs and testing strategies to insure that we covered
+a variety of circumstances in which our implementation might fail: whether
+due to error handling or request validit. We believe
+this testing strategy is sufficient because it covers all of the possible
+cases in which the implementation could fail, have a bug, or behave not as 
+intended.
